@@ -78,5 +78,7 @@ export const createNewRoom = async (roomId: string, socketId: string) => {
       lastSync: new Date().getTime() / 1000,
     },
     users: [],
+    // Initialize chat log for in-room chat feature
+    chatLog: [],
   })
 }

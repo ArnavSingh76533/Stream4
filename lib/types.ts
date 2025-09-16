@@ -62,6 +62,17 @@ export interface CommandLog {
   time: number
 }
 
+/**
+ * Chat message structure for in-room chat
+ */
+export interface ChatMessage {
+  id: string       // unique id per message
+  userId: string   // sender socket/user id
+  name: string     // sender display name
+  text: string     // message text
+  ts: number       // timestamp (ms since epoch)
+}
+
 export interface RoomState {
   serverTime: number
   id: string
@@ -69,4 +80,5 @@ export interface RoomState {
   users: UserState[]
   targetState: TargetState
   commandHistory: CommandLog[]
+  chatLog?: ChatMessage[] // optional to keep backward compatibility
 }
