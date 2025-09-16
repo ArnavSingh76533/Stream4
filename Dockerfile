@@ -20,12 +20,12 @@ RUN yarn build
 FROM node:21.0-alpine AS runner
 WORKDIR /app
 
+ENV NODE_ENV=production
+
 # Default envs (override in Space settings)
 ENV SITE_NAME="Web-SyncPlay"
-# Set this in Space settings to your Space URL, e.g. https://your-username-web-syncplay.hf.space
-ENV PUBLIC_DOMAIN="shivam413-Streamer.hf.space"
-# Use a managed Redis URL (e.g. Upstash) set in Space settings
-ENV REDIS_URL="redis://default:S5BoZJYMmACrcbLH7HpPZC4fpV0mNWHR@redis-18916.c309.us-east-2-1.ec2.redns.redis-cloud.com:18916"
+# IMPORTANT: include the scheme. Replace with your actual Space URL.
+ENV PUBLIC_DOMAIN="https://shivam413-Streamer.hf.space"
 
 # Hugging Face Spaces expects your app to listen on $PORT (default 7860)
 ENV PORT=7860
