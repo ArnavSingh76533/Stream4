@@ -38,5 +38,5 @@ export function getDefaultSrc(): string {
   }
 
   // console.warn("ENV 'DEFAULT_SRC' has no value, using no src")
-  return "https://youtu.be/NcBjx_eyvxc4"
+  return "https://youtu.be/c-FKlE3_kHo"
 }
