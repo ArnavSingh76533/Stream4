@@ -1,82 +1,119 @@
 import type { NextApiRequest, NextApiResponse } from "next"
-import { execFile } from "node:child_process"
 
 type YtResult = {
   id: string
   title: string
   url: string
+  duration?: number
+  thumbnails?: { url: string; width?: number; height?: number }[]
 }
 
-function run(cmd: string, args: string[]) {
-  return new Promise<{ stdout: string; stderr: string }>((resolve, reject) => {
-    execFile(cmd, args, { maxBuffer: 16 * 1024 * 1024 }, (err, stdout, stderr) => {
-      if (err) return reject(Object.assign(err, { stdout, stderr }))
-      resolve({ stdout, stderr })
-    })
-  })
+function limitInt(v: string | number | undefined, def = 8, min = 1, max = 20) {
+  const n = Number(v)
+  if (!Number.isFinite(n)) return def
+  return Math.max(min, Math.min(max, Math.floor(n)))
 }
 
-// Extract the first YouTube watch URL from yt-dlp verbose output.
-function extractFirstYoutubeUrl(text: string): string | null {
-  // Look for explicit "Extracting URL: <url>" first
-  const explicit = text.match(/Extracting URL:\s*(https?:\/\/[^\s]+)/i)
-  if (explicit?.[1]) return explicit[1]
-
-  // Fallback: find any YouTube watch URL in output
-  const anyWatch = text.match(/https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[\w\-]{6,}/i)
-  if (anyWatch?.[0]) return anyWatch[0]
-
-  return null
-}
-
-// Pull the 11-char YouTube video id from a watch URL
-function videoIdFromUrl(u: string): string | null {
-  try {
-    const url = new URL(u)
-    const id = url.searchParams.get("v")
-    if (id) return id
-  } catch {
-    // ignore
+function thumbsFromSnippet(thumbs: any): { url: string; width?: number; height?: number }[] | undefined {
+  const out: { url: string; width?: number; height?: number }[] = []
+  for (const v of Object.values<any>(thumbs || {})) {
+    if (v?.url) out.push({ url: v.url, width: v.width, height: v.height })
   }
-  // Fallback quick parse
-  const m = u.match(/[?&]v=([\w\-]{6,})/)
-  return m?.[1] || null
+  return out.length ? out : undefined
+}
+
+async function searchYouTubeAPI(q: string, limit: number, key: string): Promise<YtResult[]> {
+  const url = new URL("https://www.googleapis.com/youtube/v3/search")
+  url.searchParams.set("part", "snippet")
+  url.searchParams.set("type", "video")
+  url.searchParams.set("maxResults", String(limit))
+  url.searchParams.set("q", q)
+  url.searchParams.set("key", key)
+
+  const r = await fetch(url.toString(), { next: { revalidate: 300 } })
+  if (!r.ok) throw new Error(`ytapi_http_${r.status}`)
+  const data = await r.json()
+  const items: any[] = Array.isArray(data?.items) ? data.items : []
+  return items
+    .map((it: any) => {
+      const id = it?.id?.videoId
+      const sn = it?.snippet
+      if (!id || !sn?.title) return null
+      return {
+        id,
+        title: sn.title,
+        url: `https://www.youtube.com/watch?v=${id}`,
+        thumbnails: thumbsFromSnippet(sn.thumbnails),
+      } as YtResult
+    })
+    .filter(Boolean) as YtResult[]
+}
+
+async function searchPipedServer(q: string, limit: number): Promise<YtResult[]> {
+  // Try a few public instances; server-side DNS might still fail depending on your host.
+  const instances = [
+    "https://pipedapi.kavin.rocks",
+    "https://piped.video",
+    "https://piped.mha.fi",
+    "https://piped-api.garudalinux.org",
+  ]
+  for (const base of instances) {
+    try {
+      const url = new URL("/search", base)
+      url.searchParams.set("q", q)
+      const r = await fetch(url.toString(), { cache: "no-store" })
+      if (!r.ok) continue
+      const data = await r.json()
+      const items: any[] = Array.isArray(data?.items) ? data.items : []
+      const results = items
+        .filter((it) => it?.type?.toLowerCase() === "video" && it?.id && it?.title)
+        .slice(0, limit)
+        .map((it) => {
+          const id = it.id
+          return {
+            id,
+            title: it.title,
+            url: `https://www.youtube.com/watch?v=${id}`,
+            duration: typeof it.duration === "number" ? it.duration : undefined,
+            thumbnails: it.thumbnail ? [{ url: it.thumbnail }] : undefined,
+          } as YtResult
+        })
+      if (results.length) return results
+    } catch {
+      // try next instance
+    }
+  }
+  return []
 }
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const q = (req.query.q || "").toString().trim()
   if (!q) return res.status(400).json({ error: "Missing q" })
+  const limit = limitInt(req.query.limit, 8, 1, 20)
+
+  // Edge cache (if available)
+  res.setHeader("Cache-Control", "s-maxage=300, stale-while-revalidate")
 
   try {
-    // Use exactly the approach that works in your environment:
-    // yt-dlp "ytsearch:<query>"
-    // We also add --skip-download to avoid writing files to disk.
-    const term = `ytsearch:${q}`
-    const { stdout, stderr } = await run("yt-dlp", [term, "--no-warnings", "--skip-download"])
-
-    const url = extractFirstYoutubeUrl(stdout + "\n" + stderr)
-    if (!url) {
-      return res.status(502).json({
-        error: "no_url_found",
-        detail: "yt-dlp did not print a watch URL. Full logs are suppressed in production.",
-      })
+    const ytKey = process.env.YT_API_KEY || process.env.YOUTUBE_API_KEY
+    if (ytKey) {
+      try {
+        const results = await searchYouTubeAPI(q, limit, ytKey)
+        if (results.length) return res.json({ results, source: "youtube_api" })
+      } catch {
+        // fall back to piped
+      }
     }
 
-    const id = videoIdFromUrl(url) || ""
-    const results: YtResult[] = [
-      {
-        id,
-        url,
-        // Use the query as a placeholder title; client can show this or just use Play.
-        title: q,
-      },
-    ]
-    return res.json({ results, source: "yt-dlp-ytsearch" })
+    const piped = await searchPipedServer(q, limit)
+    if (piped.length) return res.json({ results: piped, source: "piped" })
+
+    return res.status(502).json({ error: "no_results", detail: "All server-side search methods failed or returned empty." })
   } catch (err: any) {
-    console.error("yt-dlp search failed", err)
+    console.error("search endpoint failed", err)
     return res.status(500).json({
       error: "search_failed",
-      detail: err?.stderr || err?.message || "unknown_error",
+      detail: err?.message || "unknown_error",
     })
   }
 }
