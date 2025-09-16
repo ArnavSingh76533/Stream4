@@ -15,6 +15,65 @@ interface Props {
   socket: Socket<ServerToClientEvents, ClientToServerEvents> | null
 }
 
+async function fetchWithTimeout(input: RequestInfo | URL, init: RequestInit = {}, ms = 5000) {
+  const controller = new AbortController()
+  const t = setTimeout(() => controller.abort(), ms)
+  try {
+    const res = await fetch(input, { ...init, signal: controller.signal })
+    return res
+  } finally {
+    clearTimeout(t)
+  }
+}
+
+async function searchViaServer(q: string, limit = 8): Promise<Result[] | null> {
+  try {
+    const r = await fetchWithTimeout(`/api/search?q=${encodeURIComponent(q)}&limit=${limit}`, {}, 5000)
+    if (!r.ok) return null
+    const data = await r.json()
+    return Array.isArray(data?.results) ? data.results : null
+  } catch {
+    return null
+  }
+}
+
+async function searchViaPipedClient(q: string, limit = 8): Promise<Result[] | null> {
+  // Browser → public Piped instances to bypass server DNS issues
+  const instances = [
+    "https://pipedapi.kavin.rocks",
+    "https://piped.video",
+    "https://piped.mha.fi",
+    "https://piped-api.garudalinux.org",
+  ]
+  for (const base of instances) {
+    try {
+      const url = new URL("/search", base)
+      url.searchParams.set("q", q)
+      const r = await fetchWithTimeout(url.toString(), { cache: "no-store" }, 6000)
+      if (!r.ok) continue
+      const data = await r.json()
+      const items: any[] = Array.isArray(data?.items) ? data.items : []
+      const results = items
+        .filter((it) => it?.type?.toLowerCase() === "video" && it?.id && it?.title)
+        .slice(0, limit)
+        .map((it) => {
+          const id = it.id
+          return {
+            id,
+            title: it.title,
+            url: `https://www.youtube.com/watch?v=${id}`,
+            duration: typeof it.duration === "number" ? it.duration : undefined,
+            thumbnails: it.thumbnail ? [{ url: it.thumbnail }] : undefined,
+          } as Result
+        })
+      if (results.length) return results
+    } catch {
+      // try next instance
+    }
+  }
+  return null
+}
+
 const YoutubeSearch: FC<Props> = ({ socket }) => {
   const [q, setQ] = useState("")
   const [loading, setLoading] = useState(false)
@@ -26,16 +85,22 @@ const YoutubeSearch: FC<Props> = ({ socket }) => {
     if (!query) return
     setLoading(true)
     setError(null)
-    try {
-      const r = await fetch(`/api/search?q=${encodeURIComponent(query)}&limit=8`)
-      const data = await r.json()
-      if (!r.ok) throw new Error(data?.error || "Failed to search")
-      setResults(data.results || [])
-    } catch (e: any) {
-      setError(e.message || "Failed to search")
-    } finally {
-      setLoading(false)
+    setResults([])
+
+    // 1) Try server endpoint (YT API key or Piped server-side)
+    let found: Result[] | null = await searchViaServer(query, 8)
+
+    // 2) Fallback: Browser → Piped directly (bypasses server DNS)
+    if (!found || found.length === 0) {
+      found = await searchViaPipedClient(query, 8)
     }
+
+    if (!found || found.length === 0) {
+      setError("No results or all search methods failed.")
+    } else {
+      setResults(found)
+    }
+    setLoading(false)
   }
 
   return (
