@@ -11,7 +11,7 @@ import {
   setRoom,
 } from "../../lib/cache"
 import { createNewRoom, createNewUser, updateLastSync } from "../../lib/room"
-import { Playlist, RoomState, UserState } from "../../lib/types"
+import { Playlist, RoomState, UserState, ChatMessage } from "../../lib/types"
 import { isUrl } from "../../lib/utils"
 
 const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
@@ -76,6 +76,17 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
         log("joined")
 
         await createNewUser(roomId, socket.id)
+
+        // Send initial chat history to the newly joined socket
+        {
+          const r = await getRoom(roomId)
+          if (r) {
+            io.to(socket.id).emit("chatHistory", r.chatLog ?? [])
+          }
+        }
+
+        // Simple chat rate limiting per-socket
+        let lastChatAt = 0
 
         socket.on("disconnect", async () => {
           await decUsers()
@@ -309,6 +320,43 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
           room.serverTime = new Date().getTime()
           socket.emit("update", room)
         })
+
+        // ===== Chat events =====
+        socket.on("chatMessage", async (text: string) => {
+          try {
+            const now = Date.now()
+            // Basic rate limiting: 1 message every 750ms
+            if (now - lastChatAt < 750) return
+            lastChatAt = now
+
+            const msgText = (text || "").toString().trim()
+            if (!msgText) return
+            if (msgText.length > 500) return
+
+            const room = await getRoom(roomId)
+            if (room === null) return
+
+            // Find sender's display name
+            const sender = room.users.find((u) => u.socketIds[0] === socket.id)
+            const name = sender?.name ?? "Anonymous"
+
+            const msg: ChatMessage = {
+              id: `${now}-${socket.id}`,
+              userId: socket.id,
+              name,
+              text: msgText,
+              ts: now,
+            }
+
+            room.chatLog = [...(room.chatLog ?? []), msg].slice(-200)
+            await setRoom(roomId, room)
+
+            io.to(roomId).emit("chatNew", msg)
+          } catch (e) {
+            console.error("chatMessage failed:", e)
+          }
+        })
+        // =======================
       }
     )
 
