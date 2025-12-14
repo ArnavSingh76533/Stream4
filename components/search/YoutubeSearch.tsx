@@ -104,6 +104,10 @@ const YoutubeSearch: FC<Props> = ({ socket }) => {
 
   const playNow = (url: string) => socket?.emit("playUrl", url)
   const addToPlaylist = (url: string) => socket?.emit("addToPlaylist", url)
+  const closeResults = () => {
+    setResults([])
+    setError(null)
+  }
 
   return (
     <div className="flex flex-col gap-3 bg-dark-900 border border-dark-700/50 rounded-xl p-4 shadow-lg">
@@ -130,46 +134,62 @@ const YoutubeSearch: FC<Props> = ({ socket }) => {
 
       {error && <div className="text-red-400 text-sm bg-red-900/20 border border-red-700/30 rounded-lg p-2">{error}</div>}
 
-      <div className="grid gap-2 max-h-96 overflow-y-auto">
-        {results.map((r) => (
-          <div
-            key={r.id}
-            className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 p-3 rounded-lg border border-dark-700/50 bg-dark-800/50 hover:bg-dark-800 transition-all duration-200"
-          >
-            {/* Thumb */}
-            {r.thumbnails?.[0]?.url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={r.thumbnails[0].url} alt="" className="w-20 h-12 object-cover rounded-md border border-dark-700/30" />
-            ) : (
-              <div className="w-20 h-12 bg-dark-700 rounded-md border border-dark-700/30" />
-            )}
-
-            {/* Info */}
-            <div className="min-w-0">
-              <div className="truncate font-medium text-dark-200">{r.title}</div>
-              <div className="text-dark-500 text-xs truncate">{r.url}</div>
-            </div>
-
-            {/* Add (small) */}
+      {results.length > 0 && (
+        <div className="space-y-2">
+          {/* Close button for results */}
+          <div className="flex justify-between items-center">
+            <span className="text-sm text-dark-400">{results.length} results</span>
             <button
-              className={`btn bg-accent-600 hover:bg-accent-700 active:bg-accent-800 px-3 py-1.5 rounded-lg text-xs justify-center font-medium transition-all duration-200 ${ADD_BTN_WIDTH}`}
-              onClick={() => addToPlaylist(r.url)}
-              title="Add to playlist"
+              onClick={closeResults}
+              className="text-sm text-dark-400 hover:text-dark-200 underline"
+              title="Close search results"
             >
-              Add
-            </button>
-
-            {/* Play (aligned under Search button) */}
-            <button
-              className={`btn bg-primary-600 hover:bg-primary-700 active:bg-primary-800 px-3 py-1.5 rounded-lg justify-center font-medium transition-all duration-200 shadow-md hover:shadow-glow ${ACTION_BTN_WIDTH}`}
-              onClick={() => playNow(r.url)}
-              title="Play now"
-            >
-              Play
+              Close
             </button>
           </div>
-        ))}
-      </div>
+          
+          <div className="grid gap-2 max-h-96 overflow-y-auto">
+            {results.map((r) => (
+              <div
+                key={r.id}
+                className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 p-3 rounded-lg border border-dark-700/50 bg-dark-800/50 hover:bg-dark-800 transition-all duration-200"
+              >
+                {/* Thumb */}
+                {r.thumbnails?.[0]?.url ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={r.thumbnails[0].url} alt="" className="w-20 h-12 object-cover rounded-md border border-dark-700/30" />
+                ) : (
+                  <div className="w-20 h-12 bg-dark-700 rounded-md border border-dark-700/30" />
+                )}
+
+                {/* Info */}
+                <div className="min-w-0">
+                  <div className="truncate font-medium text-dark-200">{r.title}</div>
+                  <div className="text-dark-500 text-xs truncate">{r.url}</div>
+                </div>
+
+                {/* Add (small) */}
+                <button
+                  className={`btn bg-accent-600 hover:bg-accent-700 active:bg-accent-800 px-3 py-1.5 rounded-lg text-xs justify-center font-medium transition-all duration-200 ${ADD_BTN_WIDTH}`}
+                  onClick={() => addToPlaylist(r.url)}
+                  title="Add to playlist"
+                >
+                  Add
+                </button>
+
+                {/* Play (aligned under Search button) */}
+                <button
+                  className={`btn bg-primary-600 hover:bg-primary-700 active:bg-primary-800 px-3 py-1.5 rounded-lg justify-center font-medium transition-all duration-200 shadow-md hover:shadow-glow ${ACTION_BTN_WIDTH}`}
+                  onClick={() => playNow(r.url)}
+                  title="Play now"
+                >
+                  Play
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   )
 }

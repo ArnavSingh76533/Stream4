@@ -15,6 +15,7 @@ import InputUrl from "./input/InputUrl"
 import UserList from "./user/UserList"
 import ChatPanel from "./chat/ChatPanel"
 import YoutubeSearch from "./search/YoutubeSearch"
+import NameModal from "./modal/NameModal"
 
 interface Props {
   id: string
@@ -29,6 +30,7 @@ const Room: FC<Props> = ({ id }) => {
     ClientToServerEvents
   > | null>(null)
   const [url, setUrl] = useState("")
+  const [showNameModal, setShowNameModal] = useState(false)
 
   useEffect(() => {
     fetch("/api/socketio").finally(() => {
@@ -39,6 +41,12 @@ const Room: FC<Props> = ({ id }) => {
         const userName = typeof window !== "undefined" 
           ? localStorage.getItem("userName") || undefined
           : undefined
+        
+        // Show modal if no userName
+        if (!userName || !userName.trim()) {
+          setShowNameModal(true)
+          return
+        }
         
         // Get room metadata from sessionStorage (set during creation)
         const roomKey = `room_${id}_meta`
@@ -70,6 +78,33 @@ const Room: FC<Props> = ({ id }) => {
       return
     }
     setTimeout(connectionCheck, 100)
+  }
+
+  const handleNameSubmit = (name: string) => {
+    // Save to localStorage
+    if (typeof window !== "undefined") {
+      localStorage.setItem("userName", name)
+    }
+    setShowNameModal(false)
+    
+    // Get room metadata from sessionStorage (set during creation)
+    const roomKey = `room_${id}_meta`
+    const roomMeta = typeof window !== "undefined" && sessionStorage.getItem(roomKey)
+      ? JSON.parse(sessionStorage.getItem(roomKey) || "{}")
+      : {}
+    
+    const isPublic = roomMeta.isPublic
+    
+    // Create socket connection with the name
+    const newSocket = createClientSocket(id, name, isPublic)
+    newSocket.on("connect", () => {
+      setConnected(true)
+    })
+    setSocket(newSocket)
+  }
+
+  if (showNameModal) {
+    return <NameModal show={true} onSubmit={handleNameSubmit} />
   }
 
   if (!connected || socket === null) {

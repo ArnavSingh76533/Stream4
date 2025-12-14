@@ -14,14 +14,16 @@ export const updateLastSync = (room: RoomState) => {
   return room
 }
 
-export const createNewUser = async (roomId: string, socketId: string) => {
+export const createNewUser = async (roomId: string, socketId: string, userName?: string) => {
   const room = await getRoom(roomId)
   if (room === null) {
     throw new Error("Creating user for non existing room:" + roomId)
   }
 
   const users = room.users
-  let name = getRandomName()
+  let name = userName && userName.trim() ? userName.trim() : getRandomName()
+  
+  // Ensure unique name
   while (users.some((user) => user.name === name)) {
     name = getRandomName()
   }
@@ -54,7 +56,7 @@ export const createNewUser = async (roomId: string, socketId: string) => {
 export const createNewRoom = async (
   roomId: string,
   socketId: string,
-  ownerName?: string,
+  userName?: string,
   isPublic?: boolean
 ) => {
   // Use default image if available, otherwise use default video
@@ -67,7 +69,7 @@ export const createNewRoom = async (
     commandHistory: [],
     id: roomId,
     ownerId: socketId,
-    ownerName: ownerName,
+    ownerName: userName,
     isPublic: isPublic ?? false, // Default to private
     targetState: {
       playlist: {
