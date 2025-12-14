@@ -23,15 +23,15 @@ const InputText: FC<Props> = ({
   return (
     <div
       className={classNames(
-        "rounded grow flex flex-row items-center bg-dark-800 action",
+        "rounded-lg grow flex flex-row items-center bg-dark-800 border border-dark-700/50 focus-within:border-primary-500/50 transition-all duration-200",
         className
       )}
     >
-      {icon && <div className={"ml-1"}>{icon}</div>}
+      {icon && <div className={"ml-2"}>{icon}</div>}
       <input
         ref={inputRef}
         size={1}
-        className={"grow rounded bg-dark-800 px-2 py-1.5" + className}
+        className={"grow rounded-lg bg-transparent px-3 py-2.5 outline-none " + className}
         placeholder={placeholder}
         value={value}
         onChange={(event) => onChange(event.target.value)}
@@ -39,9 +39,11 @@ const InputText: FC<Props> = ({
         required={required}
         onFocus={() => inputRef.current?.select()}
       />
-      <div className={"p-1 cursor-pointer"} onClick={() => onChange("")}>
-        <IconClose />
-      </div>
+      {value && (
+        <div className={"p-2 cursor-pointer hover:text-red-400 transition-colors"} onClick={() => onChange("")}>
+          <IconClose />
+        </div>
+      )}
     </div>
   )
 }

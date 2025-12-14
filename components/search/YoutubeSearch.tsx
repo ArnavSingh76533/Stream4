@@ -106,11 +106,13 @@ const YoutubeSearch: FC<Props> = ({ socket }) => {
   const addToPlaylist = (url: string) => socket?.emit("addToPlaylist", url)
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-3 bg-dark-900 border border-dark-700/50 rounded-xl p-4 shadow-lg">
+      <h3 className="text-lg font-semibold text-primary-400 mb-1">YouTube Search</h3>
+      
       {/* Search row: input + Search button with fixed width so actions align below */}
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <input
-          className="input bg-neutral-800 p-2 rounded-md outline-none"
+          className="input bg-dark-800 border border-dark-700/50 focus:border-primary-500/50 p-2.5 rounded-lg outline-none transition-all duration-200"
           placeholder="Search YouTube (e.g., Sira)"
           value={q}
           onChange={(e) => setQ(e.target.value)}
@@ -120,37 +122,37 @@ const YoutubeSearch: FC<Props> = ({ socket }) => {
         />
         <button
           onClick={search}
-          className={`btn bg-primary-700 hover:bg-primary-600 px-3 rounded-md justify-center ${ACTION_BTN_WIDTH}`}
+          className={`btn bg-primary-600 hover:bg-primary-700 active:bg-primary-800 px-4 rounded-lg justify-center font-medium transition-all duration-200 shadow-md hover:shadow-glow ${ACTION_BTN_WIDTH}`}
         >
           {loading ? "Searching…" : "Search"}
         </button>
       </div>
 
-      {error && <div className="text-red-400 text-sm">{error}</div>}
+      {error && <div className="text-red-400 text-sm bg-red-900/20 border border-red-700/30 rounded-lg p-2">{error}</div>}
 
-      <div className="grid gap-2">
+      <div className="grid gap-2 max-h-96 overflow-y-auto">
         {results.map((r) => (
           <div
             key={r.id}
-            className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 p-2 rounded-md border"
+            className="grid grid-cols-[auto_1fr_auto_auto] items-center gap-3 p-3 rounded-lg border border-dark-700/50 bg-dark-800/50 hover:bg-dark-800 transition-all duration-200"
           >
             {/* Thumb */}
             {r.thumbnails?.[0]?.url ? (
               // eslint-disable-next-line @next/next/no-img-element
-              <img src={r.thumbnails[0].url} alt="" className="w-16 h-9 object-cover rounded-sm" />
+              <img src={r.thumbnails[0].url} alt="" className="w-20 h-12 object-cover rounded-md border border-dark-700/30" />
             ) : (
-              <div className="w-16 h-9 bg-neutral-800 rounded-sm" />
+              <div className="w-20 h-12 bg-dark-700 rounded-md border border-dark-700/30" />
             )}
 
             {/* Info */}
             <div className="min-w-0">
-              <div className="truncate">{r.title}</div>
-              <div className="opacity-60 text-xs truncate">{r.url}</div>
+              <div className="truncate font-medium text-dark-200">{r.title}</div>
+              <div className="text-dark-500 text-xs truncate">{r.url}</div>
             </div>
 
             {/* Add (small) */}
             <button
-              className={`btn bg-blue-700 hover:bg-blue-600 px-2 py-1 rounded-md text-xs justify-center ${ADD_BTN_WIDTH}`}
+              className={`btn bg-accent-600 hover:bg-accent-700 active:bg-accent-800 px-3 py-1.5 rounded-lg text-xs justify-center font-medium transition-all duration-200 ${ADD_BTN_WIDTH}`}
               onClick={() => addToPlaylist(r.url)}
               title="Add to playlist"
             >
@@ -159,7 +161,7 @@ const YoutubeSearch: FC<Props> = ({ socket }) => {
 
             {/* Play (aligned under Search button) */}
             <button
-              className={`btn bg-green-700 hover:bg-green-600 px-3 py-1 rounded-md justify-center ${ACTION_BTN_WIDTH}`}
+              className={`btn bg-primary-600 hover:bg-primary-700 active:bg-primary-800 px-3 py-1.5 rounded-lg justify-center font-medium transition-all duration-200 shadow-md hover:shadow-glow ${ACTION_BTN_WIDTH}`}
               onClick={() => playNow(r.url)}
               title="Play now"
             >

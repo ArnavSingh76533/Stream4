@@ -12,11 +12,11 @@ const Navbar = ({ roomId }: { roomId?: string }) => {
   const [showShare, setShowShare] = useState(false)
 
   return (
-    <div className={"py-1 px-2 flex flex-row gap-1 items-stretch bg-dark-900"}>
+    <div className={"py-2 px-4 flex flex-row gap-2 items-stretch bg-gradient-to-r from-dark-900 to-dark-800 border-b border-dark-700/50 shadow-lg"}>
       <Link
         href={"/"}
         className={
-          "flex p-1 shrink-0 flex-row gap-1 items-center rounded action"
+          "flex p-2 shrink-0 flex-row gap-2 items-center rounded-lg action"
         }
       >
         <Image
@@ -24,8 +24,9 @@ const Navbar = ({ roomId }: { roomId?: string }) => {
           alt={"Web-SyncPlay logo"}
           width={36}
           height={36}
+          className="rounded-lg"
         />
-        <span className={"hide-below-sm"}>{getSiteName()}</span>
+        <span className={"hide-below-sm font-semibold text-lg"}>{getSiteName()}</span>
       </Link>
       {roomId && (
         <>
@@ -34,21 +35,21 @@ const Navbar = ({ roomId }: { roomId?: string }) => {
             show={showShare}
             close={() => setShowShare(false)}
           >
-            <div>Share this link to let more people join in on the fun</div>
+            <div className="text-dark-300 mb-3">Share this link to let more people join in on the fun</div>
             <InputClipboardCopy
-              className={"bg-dark-1000"}
+              className={"bg-dark-1000 rounded-lg"}
               value={getSiteDomain() + "/room/" + roomId}
             />
           </Modal>
           <Button
             tooltip={"Share the room link"}
             id={"navbar"}
-            actionClasses={"hover:bg-primary-800 active:bg-primary-700"}
-            className={"ml-auto p-2 bg-primary-900"}
+            actionClasses={"hover:bg-primary-700 active:bg-primary-800 shadow-md hover:shadow-glow"}
+            className={"ml-auto px-4 py-2 bg-primary-600 font-medium"}
             onClick={() => setShowShare(true)}
           >
             <div className={"flex items-center mx-1"}>
-              <IconShare className={"mr-1"} />
+              <IconShare className={"mr-2"} />
               Share
             </div>
           </Button>
@@ -60,6 +61,9 @@ const Navbar = ({ roomId }: { roomId?: string }) => {
         place={"bottom"}
         style={{
           backgroundColor: "var(--dark-700)",
+          borderRadius: "0.5rem",
+          padding: "0.5rem 0.75rem",
+          fontSize: "0.875rem",
         }}
       />
     </div>

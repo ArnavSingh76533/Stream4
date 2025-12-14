@@ -67,12 +67,12 @@ const PlaylistMenu: FC<Props> = ({ socket }) => {
   }
 
   return (
-    <div className={classNames("flex flex-col", expanded && "sm:w-[300px]")}>
+    <div className={classNames("flex flex-col bg-dark-900/50 rounded-xl border border-dark-700/50 overflow-hidden", expanded && "sm:w-[320px]")}>
       <ControlButton
         tooltip={expanded ? "Hide playlist" : "Show playlist"}
         onClick={() => setExpanded(!expanded)}
         interaction={() => {}}
-        className={"flex flex-row gap-1"}
+        className={"flex flex-row gap-2 items-center justify-center bg-dark-800 hover:bg-dark-700 p-3 font-medium"}
       >
         <IconChevron
           direction={expanded ? "up" : "down"}
@@ -83,13 +83,13 @@ const PlaylistMenu: FC<Props> = ({ socket }) => {
         </div>
       </ControlButton>
       {expanded && (
-        <>
+        <div className="p-2">
           <InputUrl
             url={url}
             placeholder={"Add url..."}
             tooltip={"Add url to the playlist"}
             onChange={setUrl}
-            className={"my-1"}
+            className={"mb-2"}
             onSubmit={() => addItem(url)}
           >
             Add
@@ -132,7 +132,7 @@ const PlaylistMenu: FC<Props> = ({ socket }) => {
                   {...provided.droppableProps}
                   ref={provided.innerRef}
                   className={classNames(
-                    "flex flex-col rounded gap-1",
+                    "flex flex-col rounded-lg gap-2 min-h-[100px] p-2",
                     snapshot.isDraggingOver && "bg-dark-800"
                   )}
                 >
@@ -177,7 +177,7 @@ const PlaylistMenu: FC<Props> = ({ socket }) => {
               )}
             </Droppable>
           </DragDropContext>
-        </>
+        </div>
       )}
     </div>
   )

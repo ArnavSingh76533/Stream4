@@ -49,20 +49,27 @@ const ChatPanel: FC<Props> = ({ socket, className }) => {
   }
 
   return (
-    <div className={className ?? "flex flex-col h-64 border rounded-md"}>
-      <div className="flex-1 overflow-y-auto p-2 space-y-2 bg-neutral-900/30">
+    <div className={className ?? "flex flex-col h-64 border border-dark-700/50 rounded-xl overflow-hidden shadow-lg bg-dark-900"}>
+      <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-dark-900/50">
         {messages.map((m) => (
-          <div key={m.id} className="text-sm">
-            <span className="font-semibold">{m.name}</span>
-            <span className="opacity-60"> • {new Date(m.ts).toLocaleTimeString()}</span>
-            <div className="break-words">{m.text}</div>
+          <div key={m.id} className="text-sm bg-dark-800/50 rounded-lg p-3 border border-dark-700/30">
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-semibold text-primary-400">{m.name}</span>
+              <span className="text-dark-500 text-xs">•</span>
+              <span className="text-dark-500 text-xs">{new Date(m.ts).toLocaleTimeString()}</span>
+            </div>
+            <div className="break-words text-dark-200">{m.text}</div>
           </div>
         ))}
-        {messages.length === 0 && <div className="opacity-60 text-sm">No messages yet</div>}
+        {messages.length === 0 && (
+          <div className="text-dark-500 text-sm text-center py-8">
+            No messages yet. Be the first to say hello! 👋
+          </div>
+        )}
       </div>
-      <div className="p-2 flex gap-2">
+      <div className="p-3 flex gap-2 bg-dark-800/50 border-t border-dark-700/50">
         <input
-          className="input flex-1 bg-neutral-800 p-2 rounded-md outline-none"
+          className="input flex-1 bg-dark-800 border border-dark-700/50 focus:border-primary-500/50 p-2.5 rounded-lg outline-none transition-all duration-200"
           placeholder="Type a message…"
           value={text}
           onChange={(e) => setText(e.target.value)}
@@ -70,7 +77,10 @@ const ChatPanel: FC<Props> = ({ socket, className }) => {
             if (e.key === "Enter") send()
           }}
         />
-        <button className="btn bg-primary-700 hover:bg-primary-600 px-3 rounded-md" onClick={send}>
+        <button 
+          className="btn bg-primary-600 hover:bg-primary-700 active:bg-primary-800 px-4 rounded-lg font-medium transition-all duration-200 shadow-md hover:shadow-glow" 
+          onClick={send}
+        >
           Send
         </button>
       </div>

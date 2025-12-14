@@ -72,14 +72,15 @@ const Room: FC<Props> = ({ id }) => {
   }
 
   return (
-    <div className={"flex flex-col sm:flex-row gap-1"}>
+    <div className={"flex flex-col sm:flex-row gap-2"}>
       <div className={"grow"}>
         <Player roomId={id} socket={socket} />
 
-        <div className={"flex flex-row gap-1 p-1"}>
+        <div className={"flex flex-row gap-2 p-2 bg-dark-900/50 rounded-lg border border-dark-700/50 mt-2"}>
           <Button
             tooltip={"Do a forced manual sync"}
-            className={"p-2 flex flex-row gap-1 items-center"}
+            className={"px-3 py-2 flex flex-row gap-2 items-center"}
+            actionClasses={"bg-dark-800 hover:bg-dark-700 active:bg-dark-600 border border-dark-700/50"}
             onClick={() => {
               console.log("Fetching update", socket?.id)
               socket?.emit("fetch")
@@ -105,7 +106,7 @@ const Room: FC<Props> = ({ id }) => {
         </div>
 
         {/* Chat + YouTube Search */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2 p-1">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 p-2 mt-2">
           <ChatPanel socket={socket} />
           <YoutubeSearch socket={socket} />
         </div>
