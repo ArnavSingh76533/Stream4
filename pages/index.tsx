@@ -67,7 +67,8 @@ export default function Index() {
           {/* User Name Input */}
           <div>
             <label className="block text-sm font-medium text-dark-300 mb-1.5">
-              Your Name
+              Your Name {" "}
+              <span className="text-xs text-dark-500">(optional for joining, required for creating)</span>
             </label>
             <InputText
               value={userName}
