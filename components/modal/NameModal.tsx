@@ -36,15 +36,21 @@ const NameModal: FC<Props> = ({ show, onSubmit }) => {
           Please enter your name to join this room. This will be your display name visible to other participants.
         </p>
         <div>
-          <InputText
-            value={name}
-            placeholder="Your display name"
-            onChange={(value) => {
-              setName(value)
-              setError("")
-            }}
-            required
-          />
+          <div onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              handleSubmit()
+            }
+          }}>
+            <InputText
+              value={name}
+              placeholder="Your display name"
+              onChange={(value) => {
+                setName(value)
+                setError("")
+              }}
+              required
+            />
+          </div>
           {error && (
             <p className="text-red-500 text-sm mt-2">{error}</p>
           )}
