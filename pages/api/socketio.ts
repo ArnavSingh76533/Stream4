@@ -69,8 +69,8 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
         }
 
         const roomId = socket.handshake.query.roomId.toLowerCase()
-        const ownerName = typeof socket.handshake.query.ownerName === "string" 
-          ? socket.handshake.query.ownerName 
+        const userName = typeof socket.handshake.query.userName === "string" 
+          ? socket.handshake.query.userName 
           : undefined
         const isPublic = socket.handshake.query.isPublic === "true"
         
@@ -83,15 +83,15 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
         }
 
         if (!(await roomExists(roomId))) {
-          await createNewRoom(roomId, socket.id, ownerName, isPublic)
-          log("created room", { ownerName, isPublic })
+          await createNewRoom(roomId, socket.id, userName, isPublic)
+          log("created room", { userName, isPublic })
         }
 
         socket.join(roomId)
         await incUsers()
         log("joined")
 
-        await createNewUser(roomId, socket.id)
+        await createNewUser(roomId, socket.id, userName)
 
         // Send initial chat history to the newly joined socket
         {

@@ -66,13 +66,13 @@ export function playItemFromPlaylist(
 
 export function createClientSocket(
   roomId: string,
-  ownerName?: string,
+  userName?: string,
   isPublic?: boolean
 ): TypedSocket {
   console.log("Trying to join room", roomId)
   const query: any = { roomId }
-  if (ownerName) {
-    query.ownerName = ownerName
+  if (userName) {
+    query.userName = userName
   }
   if (isPublic !== undefined) {
     query.isPublic = isPublic.toString()
