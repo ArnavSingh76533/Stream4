@@ -11,9 +11,15 @@ import {
   setRoom,
 } from "../../lib/cache"
 import { createNewRoom, createNewUser, updateLastSync } from "../../lib/room"
-import { Playlist, RoomState, UserState, ChatMessage } from "../../lib/types"
+import { Playlist, RoomState, UserState, ChatMessage, MediaElement } from "../../lib/types"
 import { isUrl } from "../../lib/utils"
 import { getDefaultImg, getDefaultSrc } from "../../lib/env"
+
+// Helper function to create a media element from a URL
+const createMediaElement = (url: string): MediaElement => ({
+  src: [{ src: url, resolution: "" }],
+  sub: [],
+})
 
 const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
   // @ts-ignore
@@ -314,15 +320,10 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
           }
 
           // Add new video to playlist at position 0
-          room.targetState.playlist.items.unshift({
-            src: [{ src: url, resolution: "" }],
-            sub: [],
-          })
+          const newMedia = createMediaElement(url)
+          room.targetState.playlist.items.unshift(newMedia)
           
-          room.targetState.playing = {
-            src: [{ src: url, resolution: "" }],
-            sub: [],
-          }
+          room.targetState.playing = newMedia
           room.targetState.playlist.currentIndex = 0
           room.targetState.progress = 0
           room.targetState.lastSync = new Date().getTime() / 1000
@@ -341,10 +342,7 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
           if (!isUrl(url)) return log("addToPlaylist invalid url", url)
           log("add to playlist", url)
 
-          room.targetState.playlist.items.push({
-            src: [{ src: url, resolution: "" }],
-            sub: [],
-          })
+          room.targetState.playlist.items.push(createMediaElement(url))
 
           await broadcast(room)
         })

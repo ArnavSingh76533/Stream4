@@ -16,6 +16,22 @@ interface Props {
   className?: string
 }
 
+// Audio notification constants
+const NOTIFICATION_FREQUENCY = 800
+const NOTIFICATION_VOLUME = 0.3
+const NOTIFICATION_VOLUME_END = 0.01
+const NOTIFICATION_DURATION = 0.1
+
+// Reusable audio context for notifications
+let audioContext: AudioContext | null = null
+
+const getAudioContext = () => {
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
+  }
+  return audioContext
+}
+
 const ChatPanel: FC<Props> = ({ socket, className }) => {
   const [messages, _setMessages] = useState<ChatMessage[]>([])
   const [text, setText] = useState("")
@@ -33,21 +49,21 @@ const ChatPanel: FC<Props> = ({ socket, className }) => {
       setMessages([...messagesRef.current, msg].slice(-200))
       // Play notification sound using Web Audio API
       try {
-        const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)()
-        const oscillator = audioContext.createOscillator()
-        const gainNode = audioContext.createGain()
+        const ctx = getAudioContext()
+        const oscillator = ctx.createOscillator()
+        const gainNode = ctx.createGain()
         
         oscillator.connect(gainNode)
-        gainNode.connect(audioContext.destination)
+        gainNode.connect(ctx.destination)
         
-        oscillator.frequency.value = 800
+        oscillator.frequency.value = NOTIFICATION_FREQUENCY
         oscillator.type = 'sine'
         
-        gainNode.gain.setValueAtTime(0.3, audioContext.currentTime)
-        gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.1)
+        gainNode.gain.setValueAtTime(NOTIFICATION_VOLUME, ctx.currentTime)
+        gainNode.gain.exponentialRampToValueAtTime(NOTIFICATION_VOLUME_END, ctx.currentTime + NOTIFICATION_DURATION)
         
-        oscillator.start(audioContext.currentTime)
-        oscillator.stop(audioContext.currentTime + 0.1)
+        oscillator.start(ctx.currentTime)
+        oscillator.stop(ctx.currentTime + NOTIFICATION_DURATION)
       } catch (err) {
         console.log("Audio notification failed:", err)
       }
