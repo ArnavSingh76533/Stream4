@@ -19,6 +19,8 @@ import PlayerMenu from "./PlayerMenu"
 import { Tooltip } from "react-tooltip"
 import IconNewTab from "../icon/IconNewTab"
 import Link from "next/link"
+import IconMusic from "../icon/IconMusic"
+import IconPip from "../icon/IconPip"
 
 interface Props extends PlayerState {
   roomId: string
@@ -35,6 +37,10 @@ interface Props extends PlayerState {
   setSeeking: (seeking: boolean) => void
   playAgain: () => void
   isOwner: boolean
+  pipEnabled: boolean
+  setPipEnabled: (enabled: boolean) => void
+  musicMode: boolean
+  setMusicMode: (enabled: boolean) => void
 }
 
 let interaction = false
@@ -69,6 +75,10 @@ const Controls: FC<Props> = ({
   setSeeking,
   playAgain,
   isOwner,
+  pipEnabled,
+  setPipEnabled,
+  musicMode,
+  setMusicMode,
 }) => {
   const [showControls, setShowControls] = useState(true)
   const [showTimePlayed, setShowTimePlayed] = useState(true)
@@ -279,6 +289,32 @@ const Controls: FC<Props> = ({
             menuOpen={menuOpen}
             setMenuOpen={setMenuOpen}
           />
+
+          <ControlButton
+            tooltip={musicMode ? "Exit music mode" : "Enter music mode"}
+            onClick={() => {
+              setMusicMode(!musicMode)
+              if (!musicMode && pipEnabled) {
+                setPipEnabled(false)
+              }
+            }}
+            interaction={showControlsAction}
+          >
+            <IconMusic />
+          </ControlButton>
+
+          <ControlButton
+            tooltip={pipEnabled ? "Exit PiP" : "Enter PiP"}
+            onClick={() => {
+              setPipEnabled(!pipEnabled)
+              if (!pipEnabled && musicMode) {
+                setMusicMode(false)
+              }
+            }}
+            interaction={showControlsAction}
+          >
+            <IconPip />
+          </ControlButton>
 
           <ControlButton
             tooltip={fullscreen ? "Leave fullscreen" : "Enter fullscreen"}
