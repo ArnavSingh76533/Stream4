@@ -1,8 +1,26 @@
 import { RoomState } from "./types"
 
-// In-memory stores
-const rooms = new Map<string, RoomState>()
-let userCount = 0
+// Use global object to ensure cache is shared across all API routes in development
+// In Next.js dev mode, modules can be loaded multiple times, so we need to use global
+const globalForCache = global as typeof globalThis & {
+  roomsCache?: Map<string, RoomState>
+  userCount?: number
+}
+
+// In-memory stores - use global to persist across hot reloads
+const rooms = globalForCache.roomsCache || new Map<string, RoomState>()
+if (!globalForCache.roomsCache) {
+  globalForCache.roomsCache = rooms
+}
+
+if (!globalForCache.userCount) {
+  globalForCache.userCount = 0
+}
+
+const getUserCount = () => globalForCache.userCount || 0
+const setUserCount = (count: number) => {
+  globalForCache.userCount = count
+}
 
 export const getRoom = async (roomId: string): Promise<RoomState | null> => {
   return rooms.get(roomId) ?? null
@@ -31,21 +49,33 @@ export const countRooms = async (): Promise<number> => {
 }
 
 export const countUsers = async (): Promise<number> => {
-  return userCount
+  return getUserCount()
 }
 
 export const incUsers = async (): Promise<number> => {
-  userCount += 1
-  return userCount
+  const newCount = getUserCount() + 1
+  setUserCount(newCount)
+  return newCount
 }
 
 export const decUsers = async (): Promise<number> => {
-  userCount = Math.max(0, userCount - 1)
-  return userCount
+  const newCount = Math.max(0, getUserCount() - 1)
+  setUserCount(newCount)
+  return newCount
 }
 
 export const wipeCache = async (): Promise<"OK"> => {
   rooms.clear()
-  userCount = 0
+  setUserCount(0)
   return "OK"
+}
+
+export const getPublicRooms = async (): Promise<RoomState[]> => {
+  const publicRooms: RoomState[] = []
+  for (const [_, room] of rooms) {
+    if (room.isPublic) {
+      publicRooms.push(room)
+    }
+  }
+  return publicRooms
 }
