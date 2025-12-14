@@ -9,16 +9,16 @@ interface Props {
 
 const Footer: FC<Props> = ({ error }) => {
   return (
-    <footer className={"flex flex-col bg-dark-900 py-1 px-4"}>
-      {error && <div>Error {error}</div>}
-      <div className={"text-sm flex flex-col gap-1 sm:flex-row sm:items-center"}>
-        <div className={"flex flex-row items-center"}>
+    <footer className={"flex flex-col bg-gradient-to-r from-dark-900 to-dark-800 py-3 px-6 border-t border-dark-700/50 mt-auto"}>
+      {error && <div className="text-red-400 font-medium mb-2">Error {error}</div>}
+      <div className={"text-sm flex flex-col gap-2 sm:flex-row sm:items-center text-dark-400"}>
+        <div className={"flex flex-row items-center gap-1"}>
           <IconCopyright sizeClassName={"h-3 w-3"}/>
           <NewTabLink href={"t.me/yucant"}>Charlie</NewTabLink>
-          2022,
+          2022
         </div>
 
-        <div>
+        <div className="flex flex-row items-center gap-1">
           Icons by
           <NewTabLink href={"https://heroicons.com"}>Heroicons</NewTabLink>
           and
@@ -26,10 +26,10 @@ const Footer: FC<Props> = ({ error }) => {
         </div>
 
         <NewTabLink
-          className={"ml-auto flex items-center"}
+          className={"ml-auto flex items-center gap-1 hover:text-primary-500 transition-colors"}
           href={"shivam413-Streamer.hf.space"}
         >
-          <IconGithub className={"mr-1"} /> Github
+          <IconGithub className={"w-4 h-4"} /> Github
         </NewTabLink>
       </div>
     </footer>

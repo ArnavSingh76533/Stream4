@@ -15,10 +15,10 @@ export default function Index() {
 
   return (
     <Layout meta={{ robots: "index, archive, follow" }} showNavbar={false}>
-      <div className={"self-center flex justify-center"}>
+      <div className={"self-center flex justify-center items-center min-h-[70vh]"}>
         <form
           className={
-            "flex flex-col gap-4 justify-center rounded shadow p-3 bg-dark-900 m-8"
+            "flex flex-col gap-6 justify-center rounded-xl shadow-2xl p-8 bg-gradient-to-br from-dark-800 to-dark-900 m-8 max-w-md w-full border border-dark-700/50"
           }
           onSubmit={async (e) => {
             e.preventDefault()
@@ -28,7 +28,13 @@ export default function Index() {
             }
           }}
         >
-          <h1 className={"text-2xl"}>Got invited?</h1>
+          <div className="text-center">
+            <h1 className={"text-3xl font-bold bg-gradient-to-r from-primary-500 to-accent-500 bg-clip-text text-transparent mb-2"}>
+              Welcome to Streamer
+            </h1>
+            <p className="text-dark-400 text-sm">Join or create a room to watch together</p>
+          </div>
+          
           <InputText
             value={room}
             placeholder={"Enter a room ID"}
@@ -36,12 +42,13 @@ export default function Index() {
               setRoom(value.toLowerCase().replace(/[^a-z]/g, ""))
             }
           />
-          <div className={"flex gap-2 justify-end"}>
+          
+          <div className={"flex gap-3 justify-end"}>
             <Button
               tooltip={"Create a new personal room"}
-              className={"p-2"}
+              className={"px-4 py-2.5 font-medium"}
               actionClasses={
-                "bg-primary-900 hover:bg-primary-800 active:bg-primary-700"
+                "bg-accent-600 hover:bg-accent-700 active:bg-accent-800 shadow-lg hover:shadow-xl"
               }
               onClick={() => {
                 fetch("/api/generate")
@@ -67,11 +74,11 @@ export default function Index() {
             </Button>
             <Button
               tooltip={room.length < 4 ? "Invalid room id" : "Join room"}
-              className={"p-2"}
+              className={"px-4 py-2.5 font-medium"}
               actionClasses={
                 room.length >= 4
-                  ? "bg-primary-900 hover:bg-primary-800 active:bg-primary-700"
-                  : "bg-dark-700 hover:bg-dark-600 active:bg-red-700 cursor-not-allowed"
+                  ? "bg-primary-600 hover:bg-primary-700 active:bg-primary-800 shadow-lg hover:shadow-xl hover:shadow-glow"
+                  : "bg-dark-700 hover:bg-dark-600 active:bg-red-700 cursor-not-allowed opacity-50"
               }
               disabled={room.length < 4}
               type={"submit"}
@@ -79,19 +86,31 @@ export default function Index() {
               Join room
             </Button>
           </div>
-          <small className={"text-neutral-600"}>
-            <div>Currently connected:</div>
-            <div className={"flex flex-row gap-2"}>
-              <div>Rooms: {data?.rooms || 0}</div>
-              <div>Users: {data?.users || 0}</div>
-            </div>
-          </small>
+          
+          <div className={"mt-2 pt-4 border-t border-dark-700/50"}>
+            <small className={"text-dark-400"}>
+              <div className="font-medium text-dark-300 mb-1">Currently active:</div>
+              <div className={"flex flex-row gap-4 text-sm"}>
+                <div className="flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 bg-primary-500 rounded-full"></span>
+                  <span>{data?.rooms || 0} Rooms</span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="inline-block w-2 h-2 bg-accent-500 rounded-full"></span>
+                  <span>{data?.users || 0} Users</span>
+                </div>
+              </div>
+            </small>
+          </div>
         </form>
       </div>
 
       <Tooltip
         style={{
           backgroundColor: "var(--dark-700)",
+          borderRadius: "0.5rem",
+          padding: "0.5rem 0.75rem",
+          fontSize: "0.875rem",
         }}
       />
     </Layout>

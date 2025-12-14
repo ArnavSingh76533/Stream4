@@ -28,32 +28,38 @@ const Modal: FC<Props> = ({ title, show, close, children }) => {
           e.stopPropagation()
           close()
         }}
-        className={"absolute top-0 left-0 h-full w-full bg-black/50"}
+        className={"absolute top-0 left-0 h-full w-full bg-black/60 backdrop-blur-sm"}
       />
-      <div className={"flex justify-center h-full items-center"}>
-        <div className={"relative bg-dark-800 shadow rounded z-50 min-w-[30%]"}>
+      <div className={"flex justify-center h-full items-center p-4"}>
+        <div className={"relative bg-dark-800 shadow-2xl rounded-xl z-50 min-w-[30%] max-w-2xl w-full border border-dark-700/50"}>
           <div
             className={
-              "flex justify-between items-center p-2 border-b-2 border-b-dark-1000"
+              "flex justify-between items-center p-4 border-b border-dark-700/50"
             }
           >
-            <div className={"p-2 mr-2"}>
-              <h2 className={"text-xl"}>{title}</h2>
+            <div className={"px-2"}>
+              <h2 className={"text-xl font-semibold text-primary-400"}>{title}</h2>
             </div>
-            <Button tooltip={"Close modal"} id={"closeModal1"} onClick={close}>
+            <Button 
+              tooltip={"Close modal"} 
+              id={"closeModal1"} 
+              onClick={close}
+              actionClasses={"hover:bg-dark-700 active:bg-dark-600"}
+            >
               <IconClose />
             </Button>
           </div>
-          <div className={"p-4"}>{children}</div>
+          <div className={"p-6"}>{children}</div>
           <div
             className={
-              "flex justify-end items-center p-2 border-t-2 border-t-dark-1000"
+              "flex justify-end items-center p-4 border-t border-dark-700/50"
             }
           >
             <Button
               tooltip={"Close modal"}
               id={"closeModal2"}
-              className={"p-2 bg-dark-600"}
+              className={"px-4 py-2"}
+              actionClasses={"bg-dark-700 hover:bg-dark-600 active:bg-dark-500"}
               onClick={close}
             >
               Close
@@ -62,8 +68,24 @@ const Modal: FC<Props> = ({ title, show, close, children }) => {
         </div>
       </div>
 
-      <Tooltip anchorId={"closeModal1"} />
-      <Tooltip anchorId={"closeModal2"} />
+      <Tooltip 
+        anchorId={"closeModal1"} 
+        style={{
+          backgroundColor: "var(--dark-700)",
+          borderRadius: "0.5rem",
+          padding: "0.5rem 0.75rem",
+          fontSize: "0.875rem",
+        }}
+      />
+      <Tooltip 
+        anchorId={"closeModal2"}
+        style={{
+          backgroundColor: "var(--dark-700)",
+          borderRadius: "0.5rem",
+          padding: "0.5rem 0.75rem",
+          fontSize: "0.875rem",
+        }}
+      />
     </div>
   )
 }

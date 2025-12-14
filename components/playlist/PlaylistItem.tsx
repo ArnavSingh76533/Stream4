@@ -71,15 +71,19 @@ const PlaylistItem: FC<Props> = ({
           {...provided.draggableProps}
           style={provided.draggableProps.style}
           className={classNames(
-            "p-1 rounded flex flex-col",
-            snapshot.isDragging ? "bg-dark-700" : "bg-dark-900"
+            "p-3 rounded-lg flex flex-col border transition-all duration-200",
+            snapshot.isDragging 
+              ? "bg-dark-700 border-primary-500/50 shadow-glow" 
+              : playing 
+                ? "bg-dark-800 border-primary-600/50" 
+                : "bg-dark-800/50 border-dark-700/50 hover:bg-dark-800"
           )}
         >
-          <div className={"flex flex-row gap-1 items-center"}>
+          <div className={"flex flex-row gap-2 items-center mb-2"}>
             <div
               className={classNames(
-                "p-1 transition-colors hover:text-primary-900",
-                snapshot.isDragging && "text-primary-800"
+                "p-1 transition-colors hover:text-primary-500 cursor-grab active:cursor-grabbing",
+                snapshot.isDragging && "text-primary-500"
               )}
               {...provided.dragHandleProps}
             >
@@ -96,16 +100,18 @@ const PlaylistItem: FC<Props> = ({
                   placeholder={"Set a title"}
                   value={title}
                 />
-              ) :
-                titleGen(item, index)
-              }
+              ) : (
+                <span className={classNames("text-sm font-medium", playing && "text-primary-400")}>
+                  {titleGen(item, index)}
+                </span>
+              )}
             </div>
             <DeleteButton
               tooltip={"Delete " + title}
               onClick={() => deleteItem(index)}
             />
           </div>
-          <div className={"flex flex-row items-center"}>
+          <div className={"flex flex-row items-center gap-2"}>
             <ControlButton
               tooltip={playing ? "Currently playing" : "Play item now"}
               onClick={() => {
@@ -117,17 +123,17 @@ const PlaylistItem: FC<Props> = ({
             >
               {playing ? (
                 <IconDisk
-                  className={"animate-spin animate-pulse text-purple-700"}
+                  className={"animate-spin animate-pulse text-purple-500"}
                 />
               ) : (
                 <IconPlay
-                  className={"text-primary-900 hover:text-primary-900"}
+                  className={"text-primary-500 hover:text-primary-400"}
                 />
               )}
             </ControlButton>
             <NewTabLink
               href={item.src[0].src}
-              className={"flex flex-row gap-1"}
+              className={"flex flex-row gap-1 items-center text-xs text-dark-400 hover:text-primary-500 transition-colors"}
             >
               <div className={"line-clamp-2"}>{getDomain(item.src[0].src)}</div>
               <IconNewTab className={"shrink-0"} />

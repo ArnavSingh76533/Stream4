@@ -5,12 +5,12 @@
 /* input range slider */
 .slider input[type="range"] {
   --value: 0%;
-  --lower: var(--primary);
-  --upper: rgba(255, 255, 255, 0.5);
-  --size: 5px;
-  --active-size: 8px;
-  --thumb-size: 7px;
-  --thumb-active-size: 10px;
+  --lower: #10b981;
+  --upper: rgba(255, 255, 255, 0.3);
+  --size: 6px;
+  --active-size: 10px;
+  --thumb-size: 12px;
+  --thumb-active-size: 16px;
   --thumb-color: #fff;
 
   cursor: pointer;
@@ -28,7 +28,7 @@
   touch-action: manipulation;
   -webkit-appearance: none;
   -moz-appearance: none;
-  transition: height ease-in-out 0.1s;
+  transition: height ease-in-out 0.2s;
 }
 .slider input[type="range"]:hover,
 .slider input[type="range"]:active {
@@ -43,12 +43,14 @@
   background-color: var(--thumb-color);
   border-radius: 100%;
   cursor: pointer;
-  transition: width ease-in-out 0.1s, height ease-in-out 0.1s;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  transition: width ease-in-out 0.2s, height ease-in-out 0.2s, box-shadow ease-in-out 0.2s;
 }
 .slider input[type="range"]:hover::-moz-range-thumb,
 .slider input[type="range"]:active::-moz-range-thumb {
   width: var(--thumb-active-size);
   height: var(--thumb-active-size);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
 }
 
 .slider input[type="range"]::-webkit-slider-thumb {
@@ -57,13 +59,15 @@
   background-color: var(--thumb-color);
   border-radius: 100%;
   cursor: pointer;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
   -webkit-appearance: none;
-  transition: width ease-in-out 0.1s, height ease-in-out 0.1s;
+  transition: width ease-in-out 0.2s, height ease-in-out 0.2s, box-shadow ease-in-out 0.2s;
 }
 .slider input[type="range"]:hover::-webkit-slider-thumb,
 .slider input[type="range"]:active::-webkit-slider-thumb {
   width: var(--thumb-active-size);
   height: var(--thumb-active-size);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
 }
 
 .slider input[type="range"]::-ms-thumb {
@@ -72,12 +76,14 @@
   background-color: var(--thumb-color);
   border-radius: 100%;
   cursor: pointer;
-  transition: width ease-in-out 0.1s, height ease-in-out 0.1s;
+  box-shadow: 0 2px 8px rgba(16, 185, 129, 0.4);
+  transition: width ease-in-out 0.2s, height ease-in-out 0.2s, box-shadow ease-in-out 0.2s;
 }
 .slider input[type="range"]:hover::-ms-thumb,
 .slider input[type="range"]:active::-ms-thumb {
   width: var(--thumb-active-size);
   height: var(--thumb-active-size);
+  box-shadow: 0 0 16px rgba(16, 185, 129, 0.6);
 }
 
 /* edge */
@@ -89,7 +95,7 @@
   width: 100%;
   height: var(--size);
   cursor: pointer;
-  transition: width ease-in-out 0.1s, height ease-in-out 0.1s;
+  transition: width ease-in-out 0.2s, height ease-in-out 0.2s;
 }
 
 .slider input[type="range"]::-ms-fill-lower,

@@ -30,7 +30,7 @@ const Button: FC<Props> = ({
       onClick={onClick}
       type={type}
       disabled={disabled}
-      className={classNames("p-2 rounded", actionClasses, className)}
+      className={classNames("px-3 py-2 rounded-lg font-medium transition-all duration-200", actionClasses, className)}
     >
       {children}
     </button>
