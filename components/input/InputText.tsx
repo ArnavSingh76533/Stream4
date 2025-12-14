@@ -9,6 +9,7 @@ interface Props {
   required?: boolean
   className?: string
   icon?: any
+  onKeyDown?: (event: React.KeyboardEvent<HTMLInputElement>) => void
 }
 
 const InputText: FC<Props> = ({
@@ -18,6 +19,7 @@ const InputText: FC<Props> = ({
   icon,
   className = "",
   required = false,
+  onKeyDown,
 }) => {
   const inputRef = useRef<HTMLInputElement>(null)
   return (
@@ -38,6 +40,7 @@ const InputText: FC<Props> = ({
         type={"text"}
         required={required}
         onFocus={() => inputRef.current?.select()}
+        onKeyDown={onKeyDown}
       />
       {value && (
         <div className={"p-2 cursor-pointer hover:text-red-400 transition-colors"} onClick={() => onChange("")}>
