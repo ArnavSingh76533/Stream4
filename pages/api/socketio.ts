@@ -205,15 +205,18 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
             room.targetState.playlist.items.length
           ) {
             // Auto-advance to next item: play next video and remove finished one
+            // This condition ensures there IS a next item before we splice
+            const currentIdx = room.targetState.playlist.currentIndex
+            
+            // Get the next item before removing current
             room.targetState.playing =
-              room.targetState.playlist.items[
-                room.targetState.playlist.currentIndex + 1
-              ]
+              room.targetState.playlist.items[currentIdx + 1]
             
             // Remove the finished item from playlist (shift remaining items left)
-            room.targetState.playlist.items.splice(room.targetState.playlist.currentIndex, 1)
+            room.targetState.playlist.items.splice(currentIdx, 1)
             
             // Reset currentIndex to 0 since items have shifted
+            // (the next item is now at position 0)
             room.targetState.playlist.currentIndex = 0
             room.targetState.progress = 0
             room.targetState.paused = false

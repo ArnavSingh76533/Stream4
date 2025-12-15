@@ -96,7 +96,6 @@ html {
 /* Non-fullscreen video styles */
 .video-normal {
   height: calc((9 / 16) * 100vw);
-  max-height: calc(100vh - 210px);
   max-height: calc(100dvh - 210px);
 }
 

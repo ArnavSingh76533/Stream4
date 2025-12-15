@@ -116,8 +116,11 @@ const Controls: FC<Props> = ({
     const left = window.screen.width - width - 20
     const top = window.screen.height - height - 100
     
+    // Encode roomId to prevent any potential injection issues
+    const encodedRoomId = encodeURIComponent(roomId)
+    
     const pipWindow = window.open(
-      `/embed/${roomId}`,
+      `/embed/${encodedRoomId}`,
       'PiP Player',
       `width=${width},height=${height},left=${left},top=${top},resizable=yes,scrollbars=no,status=no,toolbar=no,menubar=no,location=no`
     )
@@ -334,7 +337,19 @@ const Controls: FC<Props> = ({
                 }
               } else {
                 // Try to enter PiP
-                const isYouTube = currentSrc.src.includes('youtube.com') || currentSrc.src.includes('youtu.be')
+                // More robust YouTube URL detection
+                let isYouTube = false
+                try {
+                  const url = new URL(currentSrc.src)
+                  const hostname = url.hostname.toLowerCase()
+                  isYouTube = hostname.includes('youtube.com') || 
+                              hostname.includes('youtu.be') || 
+                              hostname.includes('m.youtube.com') ||
+                              hostname.includes('gaming.youtube.com')
+                } catch (e) {
+                  // Invalid URL, treat as non-YouTube
+                  isYouTube = false
+                }
                 
                 if (isYouTube) {
                   // For YouTube, use ReactPlayer's pip prop
@@ -344,6 +359,9 @@ const Controls: FC<Props> = ({
                   }
                 } else {
                   // For file sources, try native PiP API
+                  // Note: We query for the first video element on the page.
+                  // This works for the current app structure where there's only one video player.
+                  // If multiple video elements exist, this might select the wrong one.
                   const videoElement = document.querySelector('video')
                   
                   if (videoElement && 'requestPictureInPicture' in videoElement && document.pictureInPictureEnabled) {
