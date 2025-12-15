@@ -337,15 +337,20 @@ const Controls: FC<Props> = ({
                 }
               } else {
                 // Try to enter PiP
-                // More robust YouTube URL detection
+                // Robust YouTube URL detection with proper hostname validation
                 let isYouTube = false
                 try {
                   const url = new URL(currentSrc.src)
                   const hostname = url.hostname.toLowerCase()
-                  isYouTube = hostname.includes('youtube.com') || 
-                              hostname.includes('youtu.be') || 
-                              hostname.includes('m.youtube.com') ||
-                              hostname.includes('gaming.youtube.com')
+                  // Check for exact match or subdomain of youtube.com or youtu.be
+                  isYouTube = hostname === 'youtube.com' || 
+                              hostname === 'www.youtube.com' ||
+                              hostname === 'm.youtube.com' ||
+                              hostname === 'gaming.youtube.com' ||
+                              hostname === 'youtu.be' ||
+                              hostname === 'www.youtu.be' ||
+                              hostname.endsWith('.youtube.com') ||
+                              hostname.endsWith('.youtu.be')
                 } catch (e) {
                   // Invalid URL, treat as non-YouTube
                   isYouTube = false
