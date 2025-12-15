@@ -177,27 +177,13 @@ const Controls: FC<Props> = ({
               console.log("Toggled fullscreen")
               setFullscreen(!fullscreen)
             } else if (touch) {
-              // Single touch on mobile - show controls and toggle play/pause
+              // Single touch on mobile - show controls only, no play/pause toggle
+              // Play/pause only from control buttons
               setShowControls(true)
               setMenuOpen(false)
-              // Toggle play/pause on touch (owner only)
-              if (isOwner) {
-                if (playEnded()) {
-                  playAgain()
-                } else {
-                  setPaused(!paused)
-                }
-              }
-            } else {
-              // Desktop click on center overlay - toggle play/pause if owner
-              if (isOwner) {
-                if (playEnded()) {
-                  playAgain()
-                } else {
-                  setPaused(!paused)
-                }
-              }
             }
+            // Desktop click on center overlay - no play/pause toggle
+            // Play/pause only from control buttons
 
             interact()
             mouseMoved(touch)
@@ -206,7 +192,7 @@ const Controls: FC<Props> = ({
             showControlsAction(!touch)
           }}
         >
-          {/* Center play/pause button - positioned absolutely in center */}
+          {/* Center play/pause indicator - positioned absolutely in center */}
           <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
             {paused ? <IconBigPlay /> : <IconBigPause />}
           </div>
