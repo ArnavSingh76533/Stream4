@@ -267,6 +267,17 @@ const Controls: FC<Props> = ({
             </span>
           </ControlButton>
 
+          <ControlButton
+            tooltip={fullscreen ? "Leave fullscreen" : "Enter fullscreen"}
+            onClick={() => {
+              console.log("Toggled fullscreen")
+              setFullscreen(!fullscreen)
+            }}
+            interaction={showControlsAction}
+          >
+            {fullscreen ? <IconCompress /> : <IconExpand />}
+          </ControlButton>
+
           <PlayerMenu
             roomId={roomId}
             playing={playing}
@@ -372,17 +383,6 @@ const Controls: FC<Props> = ({
             interaction={showControlsAction}
           >
             <IconPip />
-          </ControlButton>
-
-          <ControlButton
-            tooltip={fullscreen ? "Leave fullscreen" : "Enter fullscreen"}
-            onClick={() => {
-              console.log("Toggled fullscreen")
-              setFullscreen(!fullscreen)
-            }}
-            interaction={showControlsAction}
-          >
-            {fullscreen ? <IconCompress /> : <IconExpand />}
           </ControlButton>
         </div>
 

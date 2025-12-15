@@ -1,12 +1,12 @@
 import { FC } from "react"
 import Icon, { IconProps } from "./Icon"
 
-const IconSoundDown: FC<IconProps> = ({ className = "" }) => {
+const IconSoundDown: FC<IconProps> = ({ className = "", sizeClassName }) => {
   return (
-    <Icon className={className} viewBox='0 0 384 512'>
+    <Icon className={className} sizeClassName={sizeClassName} viewBox='0 0 24 24'>
       <path
         fill='currentColor'
-        d='M215.03 72.04L126.06 161H24c-13.26 0-24 10.74-24 24v144c0 13.25 10.74 24 24 24h102.06l88.97 88.95c15.03 15.03 40.97 4.47 40.97-16.97V89.02c0-21.47-25.96-31.98-40.97-16.98zm123.2 108.08c-11.58-6.33-26.19-2.16-32.61 9.45-6.39 11.61-2.16 26.2 9.45 32.61C327.98 229.28 336 242.62 336 257c0 14.38-8.02 27.72-20.92 34.81-11.61 6.41-15.84 21-9.45 32.61 6.43 11.66 21.05 15.8 32.61 9.45 28.23-15.55 45.77-45 45.77-76.88s-17.54-61.32-45.78-76.87z'
+        d='M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02z'
       />
     </Icon>
   )
