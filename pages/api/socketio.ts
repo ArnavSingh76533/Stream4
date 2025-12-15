@@ -371,7 +371,7 @@ const ioHandler = (_: NextApiRequest, res: NextApiResponse) => {
         socket.on("setMusicMode", async (musicMode: boolean) => {
           const room = await getRoom(roomId)
           if (room === null) {
-            throw new Error("Setting music mode for non existing room:" + roomId)
+            throw new Error("Setting music mode for non-existent room:" + roomId)
           }
           
           // Only allow room owner to toggle music mode
